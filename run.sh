@@ -3,7 +3,7 @@
 # 50 passwords per request to bypass rate limits
 
 USER="Adam"
-WORDLIST="/usr/share/wordlists/rockyou.txt"
+WORDLIST="pass.txt"
 COUNTER=0
 BATCH=""
 

